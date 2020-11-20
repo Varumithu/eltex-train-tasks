@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "print_matrix.h"
 
@@ -8,6 +9,10 @@ int main()
 {
     size_t size = 5;
     int* parray = (int*)malloc(size * size * sizeof(int));
+    if (parray == NULL) {
+        perror("failed to allocate memory");
+        exit(1);
+    }
     print_matrix_int(parray, size, size);
     size_t count = 0, size_sq = size * size;
     int64_t right_limit = size, left_limit = -1, down_limit = size, up_limit = 0, x = 0, y = 0;
@@ -59,5 +64,5 @@ int main()
 
     }
     print_matrix_int(parray, size, size);
-    return 0;
+    free(parray);    return 0;
 }
