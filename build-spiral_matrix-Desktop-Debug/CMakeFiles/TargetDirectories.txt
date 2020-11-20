@@ -1,0 +1,3 @@
+/home/valmit/Programming/QtProjects/EltexTasks/build-spiral_matrix-Desktop-Debug/CMakeFiles/rebuild_cache.dir
+/home/valmit/Programming/QtProjects/EltexTasks/build-spiral_matrix-Desktop-Debug/CMakeFiles/edit_cache.dir
+/home/valmit/Programming/QtProjects/EltexTasks/build-spiral_matrix-Desktop-Debug/CMakeFiles/spiral_matrix.dir

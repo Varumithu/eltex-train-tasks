@@ -1,0 +1,3 @@
+/home/valmit/Programming/QtProjects/EltexTasks/build-print_matrix-Desktop-Debug/CMakeFiles/rebuild_cache.dir
+/home/valmit/Programming/QtProjects/EltexTasks/build-print_matrix-Desktop-Debug/CMakeFiles/edit_cache.dir
+/home/valmit/Programming/QtProjects/EltexTasks/build-print_matrix-Desktop-Debug/CMakeFiles/print_matrix.dir

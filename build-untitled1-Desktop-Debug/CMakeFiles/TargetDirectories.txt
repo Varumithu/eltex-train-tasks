@@ -1,0 +1,3 @@
+/home/valmit/Programming/QtProjects/EltexTasks/build-untitled1-Desktop-Debug/CMakeFiles/rebuild_cache.dir
+/home/valmit/Programming/QtProjects/EltexTasks/build-untitled1-Desktop-Debug/CMakeFiles/edit_cache.dir
+/home/valmit/Programming/QtProjects/EltexTasks/build-untitled1-Desktop-Debug/CMakeFiles/untitled1.dir
