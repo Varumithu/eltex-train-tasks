@@ -1,24 +1,18 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <errno.h>
 
-#include "print_matrix.h"
+#include "spiral_matrix.h"
 
-int main()
+void fill_spiral_matrix(int* parray, size_t size)
 {
-    size_t size = 5;
-    int* parray = (int*)malloc(size * size * sizeof(int));
-    if (parray == NULL) {
-        perror("failed to allocate memory");
-        exit(1);
-    }
-    print_matrix_int(parray, size, size);
-    size_t count = 0, size_sq = size * size;
-    int64_t right_limit = size, left_limit = -1, down_limit = size, up_limit = 0, x = 0, y = 0;
+    int count = 0;
+    size_t size_sq = size * size;
+    int64_t right_limit = (int64_t)size, left_limit = -1,
+            down_limit = (int64_t)size, up_limit = 0, x = 0, y = 0;
     uint8_t state = 0; //0 - go right, 1 - go down, 2 - go left, 3 - go up
 
-    while(count < size_sq) {
+    while((size_t)count < size_sq) {
         switch(state){
         case 0: //going right
             for (; x < right_limit; ++x) {
@@ -63,6 +57,5 @@ int main()
         }
 
     }
-    print_matrix_int(parray, size, size);
-    free(parray);    return 0;
+
 }
