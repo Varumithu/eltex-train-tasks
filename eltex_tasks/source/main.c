@@ -7,10 +7,12 @@
 #include "print_matrix.h"
 #include "diagonal_matrix.h"
 #include "modifying_bits.h"
+#include "phonebook.h"
+#include "struct_task.h"
 
 void test_print_with_negatievs() {
     int array[] = {10, 100, 90, -101, -505, 780, 1, 2, 3};
-    print_matrix_int(&array[0], 3, 3);
+    print_matrix_int((int*)array, 3, 3);
 }
 
 void test_1() {
@@ -74,12 +76,30 @@ void test_byte_edit() {
            get_byte_shift(edit_byte_shift(value, 0x9A, 3), 3));
 }
 
+void test_pb() {
+    phonebook* pb = phonebook_create();
+    phonebook_entry* pentry = phonebook_add_entry(pb, "Vladimir", "Bachurin", "+7 992 999 99 99");
+    phonebook_print_entry(pentry);
+    phonebook_delete(pb);
+
+    phonebook_interactive(NULL);
+}
+
+void struct_task() {
+    char structure[] = {52, 0, 0, 0, 222, 0, 0, 0}; // first byte of int is the least significant one
+
+    struct test_struct_t* test_struct = (struct test_struct_t*)structure;
+    printf("%d, %d\n", test_struct->a, test_struct->i);
+}
+
 int main()
 {
 //    test_print_with_negatievs();
-    test_1();
+//    test_1();
 //    test_bytes_getter_s();
 //    test_byte_getter_p();
 //    test_byte_edit();
+    test_pb();
+//    struct_task();
     return 0;
 }
