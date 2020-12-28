@@ -8,6 +8,7 @@ phonebook* phonebook_create() {
     phonebook* pb = (phonebook*)malloc(sizeof(phonebook));
     pb->first_entry = NULL;
     pb->size = 0;
+    pb->latest_id = 0;
     return pb;
 }
 
@@ -72,6 +73,7 @@ phonebook_entry* phonebook_add_entry(phonebook* pb, char* first_name, char* last
         last_entry->next_entry = pentry;
         pentry->prev_entry = last_entry;
     }
+    pentry->id = pb->latest_id++;
     ++pb->size;
     return pentry;
 }
@@ -107,9 +109,25 @@ int phonebook_delete_entry(phonebook* pb, phonebook_entry* pentry) {
     }
 }
 
-phonebook_entry* phonebook_search(phonebook* pb, char* first_name, size_t fn_size, char* last_name, size_t ln_size,
-                                  char* phone_number, size_t num_size) {
-
+void phonebook_search(phonebook* pb, char* first_name, char* last_name,
+                                  size_t* return_array, size_t return_array_size)
+{
+    phonebook_entry* pentry = pb->first_entry;
+    size_t found_count = 0;
+    if (return_array_size == 0) {
+        return;
+    }
+    while(pentry != NULL) {
+        if ((strcmp(pentry->first_name, first_name) == 0) &&
+             (strcmp(pentry->last_name, last_name) == 0))
+        {
+            return_array[found_count] = pentry->id;
+            ++found_count;
+            if (found_count >= return_array_size)
+                break;
+        }
+        pentry = pentry->next_entry;
+    }
 }
 
 phonebook_entry* phonebook_last_entry(phonebook* pb) {
@@ -213,7 +231,16 @@ void phonebook_interactive(phonebook* pb) {
     }
 }
 
-
+phonebook_entry* get_entry_by_id(phonebook* pb, size_t id) {
+    phonebook_entry* pentry = pb->first_entry;
+    while(pentry != NULL) {
+        if(id == pentry->id) {
+            break;
+        }
+        pentry = pentry->next_entry;
+    }
+    return pentry;
+}
 
 
 

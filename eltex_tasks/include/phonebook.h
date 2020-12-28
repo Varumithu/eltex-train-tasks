@@ -14,6 +14,8 @@ typedef struct phonebook_entry_t { //easy/dumb implementation for now
     size_t last_name_count;
     size_t number_count;
 
+    size_t id;
+
     char first_name[ARR_SIZE];
     char last_name[ARR_SIZE];
     char phone_number[ARR_SIZE];
@@ -27,7 +29,7 @@ typedef struct phonebook_entry_t { //easy/dumb implementation for now
 typedef struct {
     phonebook_entry* first_entry;
     size_t size;
-
+    size_t latest_id;
 } phonebook;
 
 phonebook* phonebook_create();
@@ -39,13 +41,15 @@ phonebook_entry* phonebook_add_entry(phonebook* pb, char* first_name, char* last
 
 int phonebook_delete_entry(phonebook* pb, phonebook_entry* pentry);// return value is for errors
 
-phonebook_entry* phonebook_search(phonebook* pb, char* first_name, size_t fn_size, char* last_name, size_t ln_size,
-                        char* phone_number, size_t num_size); // Any of these parametres can be null
+phonebook_entry* phonebook_search(phonebook* pb, char* first_name, char* last_name,
+                                  size_t* return_array, size_t return_array_size);
 
 phonebook_entry* phonebook_last_entry(phonebook* pb);
 
 void phonebook_print_entry(phonebook_entry* pentry);
 
 void phonebook_interactive(phonebook* pb);
+
+phonebook_entry* get_entry_by_id(phonebook* pb, size_t id);
 
 #endif
