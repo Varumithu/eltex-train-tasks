@@ -41,7 +41,7 @@ phonebook_entry* phonebook_add_entry(phonebook* pb, char* first_name, char* last
 
 int phonebook_delete_entry(phonebook* pb, phonebook_entry* pentry);// return value is for errors
 
-phonebook_entry* phonebook_search(phonebook* pb, char* first_name, char* last_name,
+void phonebook_search(phonebook* pb, char* first_name, char* last_name,
                                   size_t* return_array, size_t return_array_size);
 
 phonebook_entry* phonebook_last_entry(phonebook* pb);
