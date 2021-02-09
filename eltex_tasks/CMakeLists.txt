@@ -9,3 +9,7 @@ add_executable(${PROJECT_NAME} ${MyCSources})
 include_directories(${PROJECT_NAME} ./include)
 
 target_link_libraries(${PROJECT_NAME} m)
+
+
+target_link_libraries(${PROJECT_NAME} ncurses)
+
