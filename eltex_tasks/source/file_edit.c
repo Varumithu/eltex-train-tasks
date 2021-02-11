@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <curses.h>
 #include <dirent.h>
+#include <string.h>
 
 #include "file_edit.h"
 
@@ -89,6 +90,45 @@ void print_text(file_manager_info info, struct dirent** namelist, size_t n) {
 
 }
 
+struct dirent*** switch_directory(file_manager_info* p_info,
+                                  struct dirent *** p_namelist, int n) {
+    struct dirent** namelist = *p_namelist;
+
+    char* path = (char*)malloc(strlen(namelist[p_info->selection]->d_name) + 3);
+
+    strcpy(path, "./");
+    strcat(path, namelist[p_info->selection]->d_name);
+    if (chdir(path) < 0) {
+        return p_namelist;
+    }
+
+    for (size_t i = 0; i < (size_t)n; ++i) {
+        free(namelist[i]);
+    }
+    free(namelist);
+
+    n = scandir(".", &namelist, NULL, alphasort);
+    if (n == -1) {
+        perror("scandir");
+        exit(EXIT_FAILURE);
+    }
+    p_info->selection = 1;
+
+    if (n > p_info->screen_height) {
+        p_info->line_last = p_info->screen_height -
+                p_info->bottom_padding - p_info->top_padding - 1;
+    }
+    else {
+        p_info->line_last = n - 1;
+    }
+
+    print_text(*p_info, namelist, (size_t)n);
+    p_info->n = n;
+
+    return p_namelist;
+}
+
+
 void scroll_if_necessary(file_manager_info info) {
     //TODO - scroll screen if selection goes off screen
 }
@@ -135,6 +175,10 @@ void file_manager_loop(file_manager_info info) {
                 print_text(info, namelist, (size_t)n);
             }
         }
+        else if (ch == KEY_ENTER | ch == 'e') {
+            switch_directory(&info, &namelist, n);
+            n = info.n;
+        }
     }
 
     for (size_t i = 0; i < (size_t)n; ++i) {
@@ -165,7 +209,7 @@ void file_manager() {
     box(wnd[1], '|', '-');
 
     file_manager_info info = {1, 1, 0, 0, 0, 0,
-                              stdscr_size_x, stdscr_size_y,
+                              stdscr_size_x, stdscr_size_y, 0,
                               {wnd[0], wnd[1]}};
 
     file_manager_loop(info);

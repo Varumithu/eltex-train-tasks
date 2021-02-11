@@ -14,6 +14,7 @@ typedef struct {
     int active_window;
     int screen_height;
     int screen_width;
+    int n;
     WINDOW* wnd[2];
 } file_manager_info;
 
