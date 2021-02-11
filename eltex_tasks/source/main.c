@@ -102,6 +102,7 @@ int main()
 //    test_byte_edit();
 //    test_pb();
 //    struct_task();
-    file_task_1();
+//    file_task_1();
+    file_manager();
     return 0;
 }
