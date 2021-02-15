@@ -56,7 +56,7 @@ void sig_winch(int signo){
     resizeterm(size.ws_row, size.ws_col);
 }
 
-void print_text(file_manager_info info, struct dirent** namelist, size_t n) {
+void print_text(file_manager_info info, struct dirent** namelist) {
     werase(info.wnd[info.active_window]);
 
 
@@ -65,7 +65,7 @@ void print_text(file_manager_info info, struct dirent** namelist, size_t n) {
         wmove(info.wnd[info.active_window],
               i - info.line_first + info.top_padding, 1);
         wprintw(info.wnd[info.active_window],
-                "%s", namelist[i]->d_name);
+                "%.20s", namelist[i]->d_name);
     }
 
     wattron(info.wnd[info.active_window], A_BOLD);
@@ -73,7 +73,7 @@ void print_text(file_manager_info info, struct dirent** namelist, size_t n) {
             info.selection - info.line_first + info.top_padding, 1);
 
     wprintw(info.wnd[info.active_window],
-            "%s", namelist[info.selection]->d_name);
+            "%.20s", namelist[info.selection]->d_name);
 
     wattroff(info.wnd[info.active_window], A_BOLD);
 
@@ -82,7 +82,7 @@ void print_text(file_manager_info info, struct dirent** namelist, size_t n) {
               i - info.line_first + info.top_padding, 1);
 
         wprintw(info.wnd[info.active_window],
-                "%s", namelist[i]->d_name);
+                "%.20s", namelist[i]->d_name);
     }
 
     box(info.wnd[info.active_window], '|', '-');
@@ -90,68 +90,79 @@ void print_text(file_manager_info info, struct dirent** namelist, size_t n) {
 
 }
 
-struct dirent*** switch_directory(file_manager_info* p_info,
-                                  struct dirent *** p_namelist, int n) {
-    struct dirent** namelist = *p_namelist;
+struct dirent*** get_namelist(file_manager_info* p_info,
+                              struct dirent*** p_namelist) {
 
-    char* path = (char*)malloc(strlen(namelist[p_info->selection]->d_name) + 3);
 
-    strcpy(path, "./");
-    strcat(path, namelist[p_info->selection]->d_name);
-    if (chdir(path) < 0) {
-        return p_namelist;
+
+//    struct dirent** namelist = *p_namelist;
+
+    for (size_t i = 0; i < (size_t)p_info->n; ++i) {
+        free((*p_namelist)[i]);
     }
+    free(*p_namelist);
 
-    for (size_t i = 0; i < (size_t)n; ++i) {
-        free(namelist[i]);
-    }
-    free(namelist);
-
-    n = scandir(".", &namelist, NULL, alphasort);
-    if (n == -1) {
+    p_info->n = scandir(".", p_namelist, NULL, alphasort);
+    if (p_info->n == -1) {
         perror("scandir");
         exit(EXIT_FAILURE);
     }
     p_info->selection = 1;
 
-    if (n > p_info->screen_height) {
+    if (p_info->n > p_info->screen_height) {
         p_info->line_last = p_info->screen_height -
                 p_info->bottom_padding - p_info->top_padding - 1;
     }
     else {
-        p_info->line_last = n - 1;
+        p_info->line_last = p_info->n - 1;
     }
 
-    print_text(*p_info, namelist, (size_t)n);
-    p_info->n = n;
+    return p_namelist;
+}
+
+struct dirent*** switch_directory(file_manager_info* p_info,
+                                  struct dirent *** p_namelist) {
+
+    char* path = (char*)malloc(strlen((*p_namelist)[p_info->selection]->d_name) + 3);
+
+    strcpy(path, "./");
+    strcat(path, (*p_namelist)[p_info->selection]->d_name);
+    if (chdir(path) < 0) {
+        return p_namelist;
+    }
+
+
+
+    get_namelist(p_info, p_namelist);
+
+    print_text(*p_info, *p_namelist);
 
     return p_namelist;
 }
 
 
-void scroll_if_necessary(file_manager_info info) {
-    //TODO - scroll screen if selection goes off screen
+void scroll_if_necessary(file_manager_info* p_info,
+                         struct dirent*** p_namelist) {
+    int dif = 0;
+    if (p_info->selection < p_info->line_first) {
+        dif = p_info->line_last - p_info->line_first;
+        p_info->line_first = p_info->selection;
+        p_info->line_last = p_info->line_first + dif;
+        print_text(*p_info, *p_namelist);
+    }
+    else if (p_info->selection > p_info->line_last) {
+        dif = p_info->line_last - p_info->line_first;
+        p_info->line_last = p_info->selection;
+        p_info->line_first = p_info->line_last - dif;
+        print_text(*p_info, *p_namelist);
+    }
 }
 
 void file_manager_loop(file_manager_info info) {
-    struct dirent **namelist;
-    int n;
-
-    n = scandir(".", &namelist, NULL, alphasort);
-    if (n == -1) {
-        perror("scandir");
-        exit(EXIT_FAILURE);
-    }
-    info.selection = 3;
-
-    if (n > info.screen_height) {
-        info.line_last = info.screen_height - info.bottom_padding - info.top_padding - 1;
-    }
-    else {
-        info.line_last = n - 1;
-    }
-
-    print_text(info, namelist, (size_t)n);
+    struct dirent **namelist = NULL;
+    info.n = 0;
+    get_namelist(&info, &namelist);
+    print_text(info, namelist);
 
     while(1) {
         int ch = getch();
@@ -162,26 +173,25 @@ void file_manager_loop(file_manager_info info) {
             break;
         }
         else if (ch == KEY_DOWN | ch == 'j') {
-            if (info.selection < info.line_last) {
+            if (info.selection < info.n - 1) {
                 ++info.selection;
-                scroll_if_necessary(info);
-                print_text(info, namelist, (size_t)n);
+                scroll_if_necessary(&info, &namelist);
+                print_text(info, namelist);
             }
         }
         else if (ch == KEY_UP | ch == 'k') {
-            if (info.selection > info.line_first) {
+            if (info.selection > 0) {
                 --info.selection;
-                scroll_if_necessary(info);
-                print_text(info, namelist, (size_t)n);
+                scroll_if_necessary(&info, &namelist);
+                print_text(info, namelist);
             }
         }
         else if (ch == KEY_ENTER | ch == 'e') {
-            switch_directory(&info, &namelist, n);
-            n = info.n;
+            switch_directory(&info, &namelist);
         }
     }
 
-    for (size_t i = 0; i < (size_t)n; ++i) {
+    for (size_t i = 0; i < (size_t)info.n; ++i) {
         free(namelist[i]);
     }
     free(namelist);
