@@ -16,6 +16,7 @@ typedef struct {
     int screen_width;
     int n;
     WINDOW* wnd[2];
+    char* memorized_path;
 } file_manager_info;
 
 void file_manager();

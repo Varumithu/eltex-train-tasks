@@ -137,6 +137,8 @@ struct dirent*** switch_directory(file_manager_info* p_info,
 
     print_text(*p_info, *p_namelist);
 
+    free(path);
+
     return p_namelist;
 }
 
@@ -158,11 +160,63 @@ void scroll_if_necessary(file_manager_info* p_info,
     }
 }
 
+void switch_active_window(file_manager_info* p_info, struct dirent*** p_namelist) {
+
+
+    ssize_t path_max;
+    size_t size;
+    char *buf = NULL;
+    char *ptr = NULL;
+
+
+    path_max = (ssize_t)pathconf(".", _PC_PATH_MAX);
+    if (path_max == -1)
+        size = 1024;
+    else if (path_max > 10240)
+        size = 10240;
+    else
+        size = (size_t)path_max;
+
+    for (buf = ptr = NULL; ptr == NULL; size *= 2)
+    {
+        if ((buf = realloc(buf, size)) == NULL)
+        {
+            exit(1);
+        }
+
+
+        ptr = getcwd(buf, size);
+        if (ptr == NULL && errno != ERANGE)
+        {
+            exit(1);
+        }
+    }
+
+    if (p_info->memorized_path != NULL) {
+        chdir(p_info->memorized_path);
+    }
+
+    ++p_info->active_window;
+    p_info->active_window %= 2;
+    get_namelist(p_info, p_namelist);
+    p_info->selection = 0;
+    switch_directory(p_info, p_namelist);
+
+
+    free(p_info->memorized_path);
+    p_info->memorized_path = buf;
+
+
+}
+
 void file_manager_loop(file_manager_info info) {
     struct dirent **namelist = NULL;
     info.n = 0;
     get_namelist(&info, &namelist);
     print_text(info, namelist);
+
+    switch_active_window(&info, &namelist);
+    switch_active_window(&info, &namelist);
 
     while(1) {
         int ch = getch();
@@ -188,6 +242,9 @@ void file_manager_loop(file_manager_info info) {
         }
         else if (ch == KEY_ENTER | ch == 'e') {
             switch_directory(&info, &namelist);
+        }
+        else if (ch == '\t' | ch == 'w') {
+            switch_active_window(&info, &namelist);
         }
     }
 
@@ -220,7 +277,7 @@ void file_manager() {
 
     file_manager_info info = {1, 1, 0, 0, 0, 0,
                               stdscr_size_x, stdscr_size_y, 0,
-                              {wnd[0], wnd[1]}};
+                              {wnd[0], wnd[1]}, NULL};
 
     file_manager_loop(info);
 
