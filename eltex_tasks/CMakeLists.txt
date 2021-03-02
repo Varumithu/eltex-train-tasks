@@ -31,6 +31,11 @@ add_subdirectory(file_manager)
 target_link_libraries(${PROJECT_NAME} file_manager)
 include_directories(${PROJECT_NAME} ./file_manager/include)
 
+#fork and shell tasks
+add_subdirectory(fork_task)
+target_link_libraries(${PROJECT_NAME} fork_task)
+include_directories(${PROJECT_NAME} ./fork_task/include)
+
 include_directories(${PROJECT_NAME} ./include)
 
 

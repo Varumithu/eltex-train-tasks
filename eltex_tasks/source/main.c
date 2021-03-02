@@ -10,6 +10,7 @@
 #include "phonebook.h"
 #include "struct_task.h"
 #include "file_edit.h"
+#include "shell.h"
 
 void test_print_with_negatievs() {
     int array[] = {10, 100, 90, -101, -505, 780, 1, 2, 3};
@@ -103,6 +104,7 @@ int main()
 //    test_pb();
 //    struct_task();
 //    file_task_1();
-    file_manager();
+//    file_manager();
+    fork_task();
     return 0;
 }
