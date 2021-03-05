@@ -105,6 +105,7 @@ int main()
 //    struct_task();
 //    file_task_1();
 //    file_manager();
-    fork_task();
+//    fork_task();
+    shell_start();
     return 0;
 }

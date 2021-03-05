@@ -3,4 +3,6 @@
 
 void fork_task();
 
+void shell_start();
+
 #endif
