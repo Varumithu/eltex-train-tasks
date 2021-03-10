@@ -41,7 +41,5 @@ void threads_task_1() {
                      (ssize_t)cur_a, a);
         }
     }
-
-
-
+    free(thread_ids);
 }
