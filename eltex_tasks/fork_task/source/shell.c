@@ -13,7 +13,7 @@ void print_invitation() {
 
 void execute_command(char*** p_args) {
 
-    if (execvp(**p_args, *p_args + 1) < 0) {
+    if (execvp(**p_args, *p_args) < 0) {
         perror("exec error");
     }
     exit(1);
@@ -118,6 +118,7 @@ void shell_start() {
         int wstatus = 0;
 
         waitpid(pid, &wstatus, 0);
+        printf("exitstatus: %d\n", wstatus);
     }
 
     free(line);
