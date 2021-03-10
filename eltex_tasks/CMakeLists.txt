@@ -36,6 +36,11 @@ add_subdirectory(fork_task)
 target_link_libraries(${PROJECT_NAME} fork_task)
 include_directories(${PROJECT_NAME} ./fork_task/include)
 
+#threads tasks
+add_subdirectory(threads_task)
+target_link_libraries(${PROJECT_NAME} threads_task)
+include_directories(${PROJECT_NAME} ./threads_task/include)
+
 include_directories(${PROJECT_NAME} ./include)
 
 
