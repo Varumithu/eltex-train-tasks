@@ -108,6 +108,8 @@ int main()
 //    file_manager();
 //    fork_task();
 //    shell_start();
-    threads_task_1();
+//    threads_task_1();
+//    shop_task();
+    err_str_test1();
     return 0;
 }
