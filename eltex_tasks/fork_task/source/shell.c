@@ -92,10 +92,12 @@ int separate_args(char* line, shell_command_t* p_command) {
 char* trim_line(char* line, shell_command_t* command) {
 
     int length = 0;
+    int count = 0;
     for (char** iterator = command->args; *iterator != NULL; ++iterator) {
         length += strlen(*iterator);
+        ++count;
     }
-    line += length + 1;
+    line += length + count - 1;
     while ((!isalnum(*line)) && (*line != '\0')) {
         ++line;
     }

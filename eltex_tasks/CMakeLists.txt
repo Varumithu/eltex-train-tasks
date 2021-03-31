@@ -41,6 +41,11 @@ add_subdirectory(threads_task)
 target_link_libraries(${PROJECT_NAME} threads_task)
 include_directories(${PROJECT_NAME} ./threads_task/include)
 
+#message queue and chat
+add_subdirectory(msg_queue)
+target_link_libraries(${PROJECT_NAME} msg_queue)
+include_directories(${PROJECT_NAME} ./msg_queue/include)
+
 include_directories(${PROJECT_NAME} ./include)
 
 

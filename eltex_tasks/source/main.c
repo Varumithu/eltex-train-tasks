@@ -12,6 +12,7 @@
 #include "file_edit.h"
 #include "shell.h"
 #include "threads.h"
+#include "chat.h"
 
 void test_print_with_negatievs() {
     int array[] = {10, 100, 90, -101, -505, 780, 1, 2, 3};
@@ -107,9 +108,10 @@ int main()
 //    file_task_1();
 //    file_manager();
 //    fork_task();
-    shell_start();
+//    shell_start();
 //    threads_task_1();
 //    shop_task();
 //    err_str_test1();
+    msg_task_1();
     return 0;
 }
