@@ -31,7 +31,7 @@ void sender(){
     mq_send(mq, message, strlen(message) + 1, 0);
     mq_close(mq);
 
-    key_t key = ftok("/home/valmit/Documents/QtProjects/eltex_tasks/eltex_tasks/msg_queue/source/msg_task1.c", 1212);
+    key_t key = ftok("/home/valmit/Documents/QtProjects/eltex_tasks/eltex_tasks/msg_queue/source/msg_task1.c", 1211);
     if (key == (key_t)-1) {
         perror("creating key");
         exit(1);
@@ -77,7 +77,7 @@ void receiver() {
     mq_unlink("/task1_queue");
     mq_close(mq);
 
-    key_t key = ftok("/home/valmit/Documents/QtProjects/eltex_tasks/eltex_tasks/msg_queue/source/msg_task1.c", 1212);
+    key_t key = ftok("/home/valmit/Documents/QtProjects/eltex_tasks/eltex_tasks/msg_queue/source/msg_task1.c", 1211);
     if (key == (key_t)-1) {
         perror("creating key");
         exit(1);
