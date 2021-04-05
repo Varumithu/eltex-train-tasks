@@ -96,6 +96,19 @@ void struct_task() {
     printf("%d, %d\n", test_struct->a, test_struct->i);
 }
 
+void chat_launcher() {
+    int choice = 0;
+    printf("1 to launch server, 2 to launch client\n");
+    scanf("%d", &choice);
+    scanf("%*c");
+    if (choice == 1) {
+        chat_server();
+    }
+    else if (choice == 2) {
+        chat_client();
+    }
+}
+
 int main()
 {
 //    test_print_with_negatievs();
@@ -112,6 +125,6 @@ int main()
 //    threads_task_1();
 //    shop_task();
 //    err_str_test1();
-    msg_task_1();
+    chat_launcher();
     return 0;
 }

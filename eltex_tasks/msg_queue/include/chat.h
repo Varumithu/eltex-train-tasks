@@ -3,4 +3,8 @@
 
 void msg_task_1();
 
+void chat_client();
+
+void chat_server();
+
 #endif

@@ -94,7 +94,7 @@ void receiver() {
         exit(1);
     }
     printf("%s", msg.mtext);
-
+    free(buf);
     exit(0);
 }
 
