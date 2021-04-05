@@ -74,11 +74,16 @@ void chat_client() {
 //            // getting updates
 //            printf("****\n%s\n****\n", buf);
 //        }
-        long res = mq_receive(input_queue, buf, (size_t)attr.mq_msgsize, &prio);
-        if (res < 0) {
-            perror("failed message receive");
+        mq_getattr(input_queue, &attr);
+        while (attr.mq_curmsgs > 0) {
+            long res = mq_receive(input_queue, buf, (size_t)attr.mq_msgsize, &prio);
+            if (res < 0) {
+                perror("failed message receive");
+            }
+            printf("****\n%s\n****\n", buf);
+            mq_getattr(input_queue, &attr);
         }
-        printf("****\n%s\n****\n", buf);
+
 
     }
 

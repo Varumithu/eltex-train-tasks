@@ -156,7 +156,14 @@ void chat_server() {
 
     while (1) {
         unsigned int prio = 0;
-        mq_receive(connection_mq, buf, (size_t)attr.mq_msgsize, &prio);
+        mq_getattr(connection_mq, &attr);
+        if (attr.mq_curmsgs > 0) {
+            mq_receive(connection_mq, buf, (size_t)attr.mq_msgsize, &prio);
+        }
+        else {
+            sleep(1);
+            continue;
+        }
         if (prio == 2) {
             //new connection
             printf("incoming connection\n");
@@ -181,6 +188,9 @@ void chat_server() {
         if (prio == 3) {
             mq_unlink("/chat_server_connection");
             mq_close(connection_mq);
+            for (size_t i = 0; i < client_count; ++i) {
+                mq_close(clients[i].to_client_mq);
+            }
             break;
             // TODO some more code to properly turn off here, maybe send messages to other clients.
         }
