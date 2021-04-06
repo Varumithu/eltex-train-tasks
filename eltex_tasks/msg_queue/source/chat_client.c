@@ -9,6 +9,32 @@
 #include <sys/stat.h>        /* For mode constants */
 #include <mqueue.h>
 #include <string.h>
+#include <pthread.h>
+
+typedef struct {
+    char* input_buf;
+    pthread_mutex_t* p_mutex;
+    size_t buf_size;
+    int flag;
+
+} input_routine_arg_t;
+
+void* input_routine(void* _arg) {
+    input_routine_arg_t* arg = (input_routine_arg_t*)_arg;
+    while(1) {
+        //the thread will die when the main thread dies so no need to break ever
+        fgets(arg->input_buf, (int)arg->buf_size, stdin);
+        *strchr(arg->input_buf, '\n') = '\0';
+        pthread_mutex_lock(arg->p_mutex);
+        arg->flag = 1;
+        pthread_mutex_unlock(arg->p_mutex);
+        while (arg->flag > 0) {
+            // this is because i don't want it to fgets anything into buf while it is in use
+            sleep(1);
+        }
+
+    }
+}
 
 void chat_client() {
 
@@ -27,10 +53,11 @@ void chat_client() {
             }
         }
         else {
-            printf("sent the connection message to the server\n");
+            printf("opened server connection queue\n");
             break;
         }
     }
+
 
     char username[100];
     username[0] = '/';
@@ -48,42 +75,73 @@ void chat_client() {
         perror("failed to allocate message buffer");
         exit(1);
     }
+
+    strncpy(buf, username + 1, strlen(username + 1));
+    buf[strlen(username + 1)] = ':';
     mq_send(server_connection, username + 1, strlen(username) + 1, 2);
 
+    char* mq_receive_buf = malloc((unsigned long)attr.mq_msgsize);
+    if (mq_receive_buf == NULL) {
+        perror("failed to allocate message buffer");
+        exit(1);
+    }
+
+    input_routine_arg_t input_routine_arg;
+    input_routine_arg.flag = 0;
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    input_routine_arg.p_mutex = &mutex;
+    input_routine_arg.buf_size = (size_t)attr.mq_msgsize - (size_t)strlen(username + 1) - 1;
+    input_routine_arg.input_buf = buf + strlen(username + 1) + 1;
+
+    pthread_t thread_id;
+    pthread_attr_t thread_attr;
+    pthread_attr_init(&thread_attr);
+    pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_DETACHED);
+    int s = pthread_create(&thread_id, &thread_attr, input_routine, (void*)(&input_routine_arg));
+    if (s != 0) {
+        perror("pthread_create error");
+        exit(1);
+    }
+    pthread_attr_destroy(&thread_attr);
     while (1) {
-        strncpy(buf, username + 1, strlen(username + 1));
-        buf[strlen(username + 1)] = ':';
-        fgets(buf + strlen(username + 1) + 1,
-              (int)attr.mq_msgsize - (int)strlen(username + 1) - 1, stdin);
-        *strchr(buf + strlen(username + 1) + 1, '\n') = '\0';
-        if (buf[strlen(username + 1) + 1] == '/') {
-            mq_send(server_connection, username, 0, 3);
-            break;
-        }
-        else {
-            int res = mq_send(server_connection, buf, strlen(buf) + 1, 1);
-            if (res < 0) {
-                perror("failed to send message");
-                exit(1);
+        if (input_routine_arg.flag == 1) {
+            if (buf[strlen(username + 1) + 1] == '/') {
+                mq_send(server_connection, username, 0, 3);
             }
-            printf("message sent\n");
+            else {
+                int res = mq_send(server_connection, buf, strlen(buf) + 1, 1);
+                if (res < 0) {
+                    perror("failed to send message");
+                    exit(1);
+                }
+                printf("message sent\n");
+            }
+            pthread_mutex_lock(&mutex);
+            input_routine_arg.flag = 0;
+            pthread_mutex_unlock(&mutex);
         }
-        unsigned int prio;
-//        while (mq_receive(input_queue, buf,
-//                       (size_t)attr.mq_msgsize, &prio) == 0) {
-//            // getting updates
-//            printf("****\n%s\n****\n", buf);
-//        }
+//        fgets(buf + strlen(username + 1) + 1,
+//              (int)attr.mq_msgsize - (int)strlen(username + 1) - 1, stdin);
+//        *strchr(buf + strlen(username + 1) + 1, '\n') = '\0';
+
+
+        unsigned int prio = 0;
+
         mq_getattr(input_queue, &attr);
         while (attr.mq_curmsgs > 0) {
-            long res = mq_receive(input_queue, buf, (size_t)attr.mq_msgsize, &prio);
+            long res = mq_receive(input_queue, mq_receive_buf, (size_t)attr.mq_msgsize, &prio);
+            if (prio == 3) {
+                break;
+            }
             if (res < 0) {
                 perror("failed message receive");
             }
-            printf("****\n%s\n****\n", buf);
+            printf(">>>>%s\n", mq_receive_buf);
             mq_getattr(input_queue, &attr);
         }
-
+        if (prio == 3) {
+            break;
+        }
 
     }
 

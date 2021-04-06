@@ -8,4 +8,6 @@ add_library(${PROJECT_NAME} ${MyCSources})
 
 target_link_libraries(${PROJECT_NAME} rt)
 
+target_link_libraries(${PROJECT_NAME} pthread)
+
 include_directories(${PROJECT_NAME} ./include)

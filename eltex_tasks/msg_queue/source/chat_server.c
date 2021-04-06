@@ -189,6 +189,7 @@ void chat_server() {
             mq_unlink("/chat_server_connection");
             mq_close(connection_mq);
             for (size_t i = 0; i < client_count; ++i) {
+                mq_send(clients[i].to_client_mq, buf, 0, 3);
                 mq_close(clients[i].to_client_mq);
             }
             break;
