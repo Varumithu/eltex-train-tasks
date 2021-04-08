@@ -22,14 +22,15 @@ typedef struct {
 void* input_routine(void* _arg) {
     input_routine_arg_t* arg = (input_routine_arg_t*)_arg;
     while(1) {
+        pthread_mutex_lock(arg->p_mutex);
         //the thread will die when the main thread dies so no need to break ever
         fgets(arg->input_buf, (int)arg->buf_size, stdin);
         *strchr(arg->input_buf, '\n') = '\0';
-        pthread_mutex_lock(arg->p_mutex);
-        arg->flag = 1;
+//        pthread_mutex_lock(arg->p_mutex);
+        arg->flag = 0;
         pthread_mutex_unlock(arg->p_mutex);
-        while (arg->flag > 0) {
-            // this is because i don't want it to fgets anything into buf while it is in use
+
+        while (arg->flag == 0) {
             sleep(1);
         }
 
@@ -65,9 +66,13 @@ void chat_client() {
     *strchr(username, '\n') = '\0';
 //    mqd_t input_queue = mq_open(username, O_RDWR | O_CREAT | O_NONBLOCK, S_IRUSR | S_IWUSR |
 //            S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, NULL);
-    mqd_t input_queue = mq_open(username, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR |
+    mqd_t input_queue = mq_open(username, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR |
                         S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, NULL);
 
+    if (input_queue == (mqd_t)(-1)) {
+        perror("failed to open input queue");
+        exit(1);
+    }
     struct mq_attr attr;
     mq_getattr(server_connection, &attr);
     char* buf = malloc((unsigned long)attr.mq_msgsize);
@@ -87,7 +92,7 @@ void chat_client() {
     }
 
     input_routine_arg_t input_routine_arg;
-    input_routine_arg.flag = 0;
+    input_routine_arg.flag = 1;
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     input_routine_arg.p_mutex = &mutex;
     input_routine_arg.buf_size = (size_t)attr.mq_msgsize - (size_t)strlen(username + 1) - 1;
@@ -104,7 +109,7 @@ void chat_client() {
     }
     pthread_attr_destroy(&thread_attr);
     while (1) {
-        if (input_routine_arg.flag == 1) {
+        if (input_routine_arg.flag == 0 && pthread_mutex_trylock(&mutex) == 0) {
             if (buf[strlen(username + 1) + 1] == '/') {
                 mq_send(server_connection, username, 0, 3);
             }
@@ -116,13 +121,9 @@ void chat_client() {
                 }
                 printf("message sent\n");
             }
-            pthread_mutex_lock(&mutex);
-            input_routine_arg.flag = 0;
+            input_routine_arg.flag = 1;
             pthread_mutex_unlock(&mutex);
         }
-//        fgets(buf + strlen(username + 1) + 1,
-//              (int)attr.mq_msgsize - (int)strlen(username + 1) - 1, stdin);
-//        *strchr(buf + strlen(username + 1) + 1, '\n') = '\0';
 
 
         unsigned int prio = 0;
