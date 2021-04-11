@@ -13,6 +13,7 @@
 #include "shell.h"
 #include "threads.h"
 #include "chat.h"
+#include "sockets_task.h"
 
 void test_print_with_negatievs() {
     int array[] = {10, 100, 90, -101, -505, 780, 1, 2, 3};
@@ -99,13 +100,24 @@ void struct_task() {
 void chat_launcher() {
     int choice = 0;
     printf("1 to launch server, 2 to launch client\n");
-    scanf("%d", &choice);
-    scanf("%*c");
+    scanf("%d%*c", &choice);
     if (choice == 1) {
         chat_server();
     }
     else if (choice == 2) {
         chat_client();
+    }
+}
+
+void socket_aflocal_launcher() {
+    int choice = 0;
+    printf("1 to launch server, 2 to launch client\n");
+    scanf("%d%*c", &choice);
+    if (choice == 1) {
+        aflocal_server();
+    }
+    else if (choice == 2) {
+        aflocal_client();
     }
 }
 
@@ -125,6 +137,7 @@ int main()
 //    threads_task_1();
 //    shop_task();
 //    err_str_test1();
-    chat_launcher();
+//    chat_launcher();
+    socket_aflocal_launcher();
     return 0;
 }
