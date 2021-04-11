@@ -30,10 +30,9 @@ void add_message(size_t* iter, size_t buf_size, message_t* message_buf,
         free(message_buf[*iter].text);
         message_buf[*iter].text = NULL;
     }
-    message_buf[*iter].text = malloc(strlen(text) + 1 + strlen(p_client->username) + 2);
-    strcpy(message_buf[*iter].text, p_client->username);
-    strcat(message_buf[*iter].text, ": ");
-    strcat(message_buf[*iter].text, text);
+    message_buf[*iter].text = malloc(strlen(text) + 1);
+    strcpy(message_buf[*iter].text, text);
+
     message_buf[*iter].client_id = p_client->id;
     message_buf[*iter].id = message_id;
     *iter = ++(*iter) % buf_size;

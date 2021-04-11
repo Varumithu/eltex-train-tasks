@@ -149,4 +149,5 @@ void chat_client() {
     mq_unlink(username);
     mq_close(input_queue);
     free(buf);
+    free(mq_receive_buf);
 }
