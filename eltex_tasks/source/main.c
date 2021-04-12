@@ -121,6 +121,19 @@ void socket_aflocal_launcher() {
     }
 }
 
+void socket_afinet_launcher() {
+    int choice = 0;
+    printf("1 to launch server, 2 to launch client\n");
+    scanf("%d%*c", &choice);
+    if (choice == 1) {
+        afinet_server();
+    }
+    else if (choice == 2) {
+        afinet_client();
+    }
+}
+
+
 int main()
 {
 //    test_print_with_negatievs();
@@ -138,6 +151,7 @@ int main()
 //    shop_task();
 //    err_str_test1();
 //    chat_launcher();
-    socket_aflocal_launcher();
+//    socket_aflocal_launcher();
+    socket_afinet_launcher();
     return 0;
 }
