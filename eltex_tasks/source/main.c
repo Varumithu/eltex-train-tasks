@@ -14,6 +14,8 @@
 #include "threads.h"
 #include "chat.h"
 #include "sockets_task.h"
+#include "shm_tasks.h"
+#include "server_models.h"
 
 void test_print_with_negatievs() {
     int array[] = {10, 100, 90, -101, -505, 780, 1, 2, 3};
@@ -133,6 +135,41 @@ void socket_afinet_launcher() {
     }
 }
 
+void server_model_selecting_launcher() {
+    int choice = 0;
+    printf("1 to launch server, 2 to launch client\n");
+    scanf("%d%*c", &choice);
+    if (choice == 1) {
+        selecting_server();
+    }
+    else if (choice == 2) {
+        test_selecting_server();
+    }
+}
+
+void server_model_man_con_launcher() {
+    int choice = 0;
+    printf("1 to launch server, 2 to launch client\n");
+    scanf("%d%*c", &choice);
+    if (choice == 1) {
+        man_con_server();
+    }
+    else if (choice == 2) {
+        test_man_con_server();
+    }
+}
+
+void thread_creating_server_launcher() {
+    int choice = 0;
+    printf("1 to launch server, 2 to launch client\n");
+    scanf("%d%*c", &choice);
+    if (choice == 1) {
+        thread_creating();
+    }
+    else if (choice == 2) {
+        test_creating_server();
+    }
+}
 
 int main()
 {
@@ -152,6 +189,10 @@ int main()
 //    err_str_test1();
 //    chat_launcher();
 //    socket_aflocal_launcher();
-    socket_afinet_launcher();
+//    socket_afinet_launcher();
+//    shared_mem_test_1();
+//    server_model_selecting_launcher();
+//    server_model_man_con_launcher();
+    thread_creating_server_launcher();
     return 0;
 }

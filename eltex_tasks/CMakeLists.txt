@@ -51,6 +51,17 @@ add_subdirectory(socket_task)
 target_link_libraries(${PROJECT_NAME} socket_task)
 include_directories(${PROJECT_NAME} ./socket_task/include)
 
+#shared memory
+add_subdirectory(shared_mem)
+target_link_libraries(${PROJECT_NAME} shared_memory)
+include_directories(${PROJECT_NAME} ./shared_mem/include)
+
+#server models
+add_subdirectory(server_models)
+target_link_libraries(${PROJECT_NAME} server_models)
+include_directories(${PROJECT_NAME} ./server_models/include)
+
+
 include_directories(${PROJECT_NAME} ./include)
 
 
