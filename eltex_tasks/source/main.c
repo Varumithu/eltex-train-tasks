@@ -192,7 +192,7 @@ int main()
 //    socket_afinet_launcher();
 //    shared_mem_test_1();
 //    server_model_selecting_launcher();
-//    server_model_man_con_launcher();
-    thread_creating_server_launcher();
+    server_model_man_con_launcher();
+//    thread_creating_server_launcher();
     return 0;
 }
