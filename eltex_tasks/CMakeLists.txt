@@ -61,6 +61,11 @@ add_subdirectory(server_models)
 target_link_libraries(${PROJECT_NAME} server_models)
 include_directories(${PROJECT_NAME} ./server_models/include)
 
+#server models
+add_subdirectory(raw_socket)
+target_link_libraries(${PROJECT_NAME} raw_socket)
+include_directories(${PROJECT_NAME} ./raw_socket/include)
+
 
 include_directories(${PROJECT_NAME} ./include)
 

@@ -16,6 +16,7 @@
 #include "sockets_task.h"
 #include "shm_tasks.h"
 #include "server_models.h"
+#include "raw_sockets.h"
 
 void test_print_with_negatievs() {
     int array[] = {10, 100, 90, -101, -505, 780, 1, 2, 3};
@@ -171,6 +172,18 @@ void thread_creating_server_launcher() {
     }
 }
 
+void raw_socket_test() {
+    int choice = 0;
+    printf("1 to launch server, 2 to launch client\n");
+    scanf("%d%*c", &choice);
+    if (choice == 1) {
+        selecting_server();
+    }
+    else if (choice == 2) {
+        raw_udp_client();
+    }
+}
+
 int main()
 {
 //    test_print_with_negatievs();
@@ -192,7 +205,8 @@ int main()
 //    socket_afinet_launcher();
 //    shared_mem_test_1();
 //    server_model_selecting_launcher();
-    server_model_man_con_launcher();
+//    server_model_man_con_launcher();
 //    thread_creating_server_launcher();
+    raw_socket_test();
     return 0;
 }
