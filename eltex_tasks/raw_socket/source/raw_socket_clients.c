@@ -36,29 +36,37 @@ void raw_udp_client() {
     init_message(&message);
     message.header.source_port = htons(RAW_SOCKET_UDP_PORT);
     message.header.dest_port = htons(SELSERV_UDP_PORT);
+    size_t ip_header_max = 60;
+
+    char* received_full = malloc(ip_header_max + sizeof(raw_message_t));
+    memset(received_full, 0, ip_header_max + sizeof(raw_message_t));
+
 
     while(1){
         printf("enter buf value\n");
         scanf("%d", &message.data.info);
-        raw_message_t received = {{0, 0, 0, 0}, {0}};
         sendto(socket_fd, &message, sizeof(message), 0,
                (struct sockaddr*)&serv_addr, sizeof(struct sockaddr_in));
-
+        raw_message_t* received_udp = NULL;
         while(1) {
-            recvfrom(socket_fd, &received, sizeof(raw_message_t), 0,
+            recvfrom(socket_fd, received_full, sizeof(raw_message_t) + ip_header_max, 0,
                      NULL, NULL);
+            uint8_t ihl = *((uint8_t*)received_full) & 0x0f;
+            ihl = ihl * 4; //length in bytes
+            received_udp = (raw_message_t*)(received_full + ihl);
             printf("received a packet from port %d to port %d\n",
-                   ntohs(received.header.source_port),
-                   ntohs(received.header.dest_port));
-            if (received.header.source_port == htons(SELSERV_UDP_PORT) ||
-                received.header.dest_port == htons(RAW_SOCKET_UDP_PORT)) {
-                printf("received %d\n", message.data.info);
+                   ntohs(received_udp->header.source_port),
+                   ntohs(received_udp->header.dest_port));
+            if (received_udp->header.source_port == htons(SELSERV_UDP_PORT) ||
+                received_udp->header.dest_port == htons(RAW_SOCKET_UDP_PORT)) {
+                printf("received %d\n", received_udp->data.info);
                 break;
             }
         }
-        if (received.data.info == 0) {
+        if (received_udp->data.info == 0) {
             break;
         }
     }
+    free(received_full);
 
 }

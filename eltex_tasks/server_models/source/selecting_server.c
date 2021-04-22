@@ -84,7 +84,8 @@ void selecting_server() {
             //udp
             recvfrom(udp_socket_fd, &buf, sizeof(buf),
                      0, (struct sockaddr*)&client_address, &addrlen);
-            printf("received udp from port %d\n", ntohs(client_address.sin_port));
+            printf("received udp from port %d buf.info = %d\n", ntohs(client_address.sin_port),
+                   buf.info);
             sendbuf.info = buf.info + 1;
             sendto(udp_socket_fd, &sendbuf, sizeof(sendbuf), 0,
                    (struct sockaddr*)&client_address, addrlen);
