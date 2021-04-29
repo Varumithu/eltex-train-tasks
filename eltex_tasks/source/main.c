@@ -180,7 +180,7 @@ void raw_socket_test() {
         selecting_server();
     }
     else if (choice == 2) {
-        raw_udp_client();
+        raw_ip_udp_client();
     }
 }
 
