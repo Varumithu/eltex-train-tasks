@@ -7,4 +7,6 @@ void chat_client();
 
 void chat_server();
 
+void* input_routine(void* _arg);
+
 #endif
